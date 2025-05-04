@@ -44,6 +44,8 @@ setInterval(() => {
 }, 180000);
 
 bot.on('message', (msg) => {
+  console.log('📥 ВХОДЯЩЕЕ СООБЩЕНИЕ:');
+  console.log(JSON.stringify(msg, null, 2));
   try {
     const text = msg.text;
     const senderId = msg.chat.id;
