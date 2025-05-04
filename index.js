@@ -54,7 +54,7 @@ bot.on('message', (msg) => {
     let label = null;
     if (text.includes('Кук-3') && text.includes('68.99')) {
       label = 'Кук-3';
-    } else if (text.includes('Кук-1') && text.includes('99.99')) {
+    } else if (text.includes('Кук-1')) {
       label = 'Кук-1';
     } else if (text.includes('Бинанс') && (text.includes('99.99') || text.includes('99.999'))) {
       label = 'Бинанс';
