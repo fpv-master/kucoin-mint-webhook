@@ -7,30 +7,7 @@ const path = require('path');
 const TelegramBot = require('node-telegram-bot-api');
 const WebSocket = require('ws');
 
-
-const express = require('express');
-const app = express();
-app.use(express.json());
-
-const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN);
-const PORT = process.env.PORT || 3000;
-const URL = process.env.RENDER_EXTERNAL_URL;
-
-bot.setWebHook(`${URL}/telegram`);
-
-app.post('/telegram', (req, res) => {
-  bot.processUpdate(req.body);
-  res.sendStatus(200);
-});
-
-app.get('/', (req, res) => {
-  res.send('Bot is alive!');
-});
-
-app.listen(PORT, () => {
-  console.log(`🚀 Webhook server started on port ${PORT}`);
-});
-
+const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN, { polling: true });
 const HELIUS_KEY = process.env.HELIUS_API_KEY;
 const PUBLIC_CHAT_ID = Number(process.env.PUBLIC_CHAT_ID);
 const PRIVATE_CHAT_ID = Number(process.env.PRIVATE_CHAT_ID);
@@ -52,7 +29,7 @@ bot.on('message', (msg) => {
     let label = null;
     if (text.includes('Кук-3') && text.includes('68.99')) {
       label = 'Кук-3';
-    } else if (text.includes('Кук-1') && text.includes('99.99')) {
+    } else if (text.includes('Кук-1')) {
       label = 'Кук-1';
     } else if (text.includes('Бинанс') && (text.includes('99.99') || text.includes('99.999'))) {
       label = 'Бинанс';
