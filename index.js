@@ -24,11 +24,11 @@ app.post('/telegram', (req, res) => {
 });
 
 app.get('/', (req, res) => {
-  res.send('✅ Kucoin Mint Tracker Webhook is running.');
+  res.send('Bot is alive!');
 });
 
 app.listen(PORT, () => {
-  console.log(`🚀 Webhook server listening on port ${PORT}`);
+  console.log(`🚀 Webhook server started on port ${PORT}`);
 });
 
 const HELIUS_KEY = process.env.HELIUS_API_KEY;
@@ -44,8 +44,6 @@ setInterval(() => {
 }, 180000);
 
 bot.on('message', (msg) => {
-  console.log('📥 ВХОДЯЩЕЕ СООБЩЕНИЕ:');
-  console.log(JSON.stringify(msg, null, 2));
   try {
     const text = msg.text;
     const senderId = msg.chat.id;
@@ -54,21 +52,19 @@ bot.on('message', (msg) => {
     let label = null;
     if (text.includes('Кук-3') && text.includes('68.99')) {
       label = 'Кук-3';
-    } else if (text.includes('Кук-1')) {
+    } else if (text.includes('Кук-1') && text.includes('99.99')) {
       label = 'Кук-1';
     } else if (text.includes('Бинанс') && (text.includes('99.99') || text.includes('99.999'))) {
       label = 'Бинанс';
     } else return;
 
-    
     let wallet = null;
     const links = msg.entities?.filter(e => e.type === 'text_link' && e.url?.includes('solscan.io/account/'));
-    if (links?.length >= 2) {
-      const match = links[1].url.match(/account\/(\w{32,44})/);
-      wallet = match?.[1];
-    }
-    if (!wallet) return;
+    const last = links?.[links.length - 1];
+    const match = last?.url?.match(/account\/(\w{32,44})/);
+    wallet = match?.[1];
 
+    if (!wallet) return;
 
     const targetChat = label === 'Бинанс' ? BINANCE_CHAT_ID : PRIVATE_CHAT_ID;
     const alertMsg = `⚠️ [${label}] Обнаружен перевод ${label === 'Кук-3' ? '68.99' : '99.99'} SOL\n💰 Адрес: <code>${wallet}</code>\n⏳ Ожидаем mint...`;
@@ -166,26 +162,6 @@ bot.on('callback_query', (query) => {
       activeWatchers.delete(wallet);
       bot.sendMessage(chatId, `❌ Слежение остановлено: <code>${meta.label}: ${wallet}</code>`, { parse_mode: 'HTML' });
     }
-  }
-});
-
-
-
-bot.onText(/\/inspect/, (msg) => {
-  const chatId = msg.chat.id;
-  if (!msg.reply_to_message) {
-    bot.sendMessage(chatId, '❗ Используйте команду /inspect в ответ на сообщение.');
-    return;
-  }
-
-  try {
-    const inspected = JSON.stringify(msg.reply_to_message, null, 2);
-    console.log("🕵️ INSPECTED MESSAGE:");
-    console.log(inspected);
-    bot.sendMessage(chatId, '📤 Структура сообщения отправлена в консоль Render.');
-  } catch (e) {
-    bot.sendMessage(chatId, '❌ Ошибка при обработке сообщения.');
-    console.error('Inspect error:', e.message);
   }
 });
 
